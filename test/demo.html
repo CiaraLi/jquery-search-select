@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns = "http://www.w3.org/1999/xhtml">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="content-type">
+<title>使用jquery.editable-select 实现可搜索的下拉框</title>
+<script src="../src/js/jquery.js" ></script>
+<script src="../src/js/jquery.editable-select.js" ></script>
+<link  rel="stylesheet"  type="text/css"  href="../src/css/jquery.editable-select.css"/>
+</head>
+<body>
+     <div>
+         <label  for="name" >输入查询内容（如:北京）</label>
+         <select name="name"  id="name" class="Winstar-input120 " style="width: 161px;">  
+		     </select> 
+     </div>  
+</body>
+<script  type="text/javascript" > 
+    $(function () {
+    	 // c初始化
+        var init = $('#name').editableSelect();  
+        
+        //文本框事件
+        $('input').on('keyup', function (e) {
+            if (e.target.id == 'name_sele') { 
+                name = $('#name_sele').val();
+                
+                //次数调用后台接口
+                $.ajax('search', {
+                    data: {name:name},
+                    type: 'post',
+                    async: true,
+                    cache: false,
+                    success: function (data) { 
+                    	  /*ajax 请求成功 更新下拉框数据*/ 
+                    	  AddListItem(data.option); 
+                    },
+                    error:function (data) {
+                    	AddListItem(search(name));
+                      
+                    }
+                });
+            }
+        }); 
+        AddListItem=function(option){
+        	 var instances = init.editableSelectInstances(); 
+              instances[0].clearListItems();
+              for (i in  option) {
+                   instances[0].addOption(i, option[i]);
+              }
+        }
+        //模拟接口数据
+        search=function(name){
+        	var searched=[];
+        	var options={0:'北京大学',1:'北京外国语学院',2:'天津大学',3:'北京戏剧学院',4:'河北大学',5:'河北工业学院',6:'上海大学',7:'南开大学',
+        		8:'北京交通大学',9:'北京航天航空大学',10:'河北经济学院'};
+          for(i in options)
+          {
+             if( options[i].indexOf(name)>=0){
+             	searched[i]=options[i];
+             } 	
+          }		
+        	return searched;
+        } 
+    });
+</script>
+</html>
